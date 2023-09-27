@@ -2,6 +2,29 @@
 
 This project is a version of "NAFNet: Nonlinear Activation Free Network for Image Restoration" that can be installed using pip. It can also be run inside a Docker container. NAFNet was built using BasicSR, and the current project utilizes both NAFNet and BasicSR.
 
+
+## Docker file
+
+``` latex
+FROM "your-base-container"
+RUN apt-get update && apt-get install -y git  
+
+RUN git clone https://github.com/navidroo/NAFNet-pip.git   
+WORKDIR NAFNet-pip
+RUN pip install -r requirements.txt  
+RUN pip install -v -e .
+```
+
+## Install
+```
+git clone https://github.com/navidroo/NAFNet-pip.git   
+cd NAFNet-pip
+pip install -r requirements.txt  
+pip install -v -e .
+```
+
+
+
 ## 📜 License and Acknowledgement
 
 This project is released under the [Apache 2.0 license](LICENSE.txt).<br>

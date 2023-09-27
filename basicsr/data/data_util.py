@@ -1,3 +1,9 @@
+# ------------------------------------------------------------------------
+# Copyright (c) 2022 megvii-model. All Rights Reserved.
+# ------------------------------------------------------------------------
+# Modified from BasicSR (https://github.com/xinntao/BasicSR)
+# Copyright 2018-2020 BasicSR Authors
+# ------------------------------------------------------------------------
 import cv2
 import numpy as np
 import torch
@@ -8,7 +14,7 @@ from basicsr.data.transforms import mod_crop
 from basicsr.utils import img2tensor, scandir
 
 
-def read_img_seq(path, require_mod_crop=False, scale=1, return_imgname=False):
+def read_img_seq(path, require_mod_crop=False, scale=1):
     """Read a sequence of images from a given folder path.
 
     Args:
@@ -16,31 +22,26 @@ def read_img_seq(path, require_mod_crop=False, scale=1, return_imgname=False):
         require_mod_crop (bool): Require mod crop for each image.
             Default: False.
         scale (int): Scale factor for mod_crop. Default: 1.
-        return_imgname(bool): Whether return image names. Default False.
 
     Returns:
         Tensor: size (t, c, h, w), RGB, [0, 1].
-        list[str]: Returned image name list.
     """
     if isinstance(path, list):
         img_paths = path
     else:
         img_paths = sorted(list(scandir(path, full_path=True)))
     imgs = [cv2.imread(v).astype(np.float32) / 255. for v in img_paths]
-
     if require_mod_crop:
         imgs = [mod_crop(img, scale) for img in imgs]
     imgs = img2tensor(imgs, bgr2rgb=True, float32=True)
     imgs = torch.stack(imgs, dim=0)
-
-    if return_imgname:
-        imgnames = [osp.splitext(osp.basename(path))[0] for path in img_paths]
-        return imgs, imgnames
-    else:
-        return imgs
+    return imgs
 
 
-def generate_frame_indices(crt_idx, max_frame_num, num_frames, padding='reflection'):
+def generate_frame_indices(crt_idx,
+                           max_frame_num,
+                           num_frames,
+                           padding='reflection'):
     """Generate an index list for reading `num_frames` frames from a sequence
     of images.
 
@@ -61,7 +62,8 @@ def generate_frame_indices(crt_idx, max_frame_num, num_frames, padding='reflecti
         list[int]: A list of indices.
     """
     assert num_frames % 2 == 1, 'num_frames should be an odd number.'
-    assert padding in ('replicate', 'reflection', 'reflection_circle', 'circle'), f'Wrong padding mode: {padding}.'
+    assert padding in ('replicate', 'reflection', 'reflection_circle',
+                       'circle'), f'Wrong padding mode: {padding}.'
 
     max_frame_num = max_frame_num - 1  # start from 0
     num_pad = num_frames // 2
@@ -97,12 +99,10 @@ def paired_paths_from_lmdb(folders, keys):
 
     Contents of lmdb. Taking the `lq.lmdb` for example, the file structure is:
 
-    ::
-
-        lq.lmdb
-        ├── data.mdb
-        ├── lock.mdb
-        ├── meta_info.txt
+    lq.lmdb
+    ├── data.mdb
+    ├── lock.mdb
+    ├── meta_info.txt
 
     The data.mdb and lock.mdb are standard lmdb files and you can refer to
     https://lmdb.readthedocs.io/en/release/ for more details.
@@ -129,31 +129,39 @@ def paired_paths_from_lmdb(folders, keys):
     Returns:
         list[str]: Returned path list.
     """
-    assert len(folders) == 2, ('The len of folders should be 2 with [input_folder, gt_folder]. '
-                               f'But got {len(folders)}')
-    assert len(keys) == 2, f'The len of keys should be 2 with [input_key, gt_key]. But got {len(keys)}'
+    assert len(folders) == 2, (
+        'The len of folders should be 2 with [input_folder, gt_folder]. '
+        f'But got {len(folders)}')
+    assert len(keys) == 2, (
+        'The len of keys should be 2 with [input_key, gt_key]. '
+        f'But got {len(keys)}')
     input_folder, gt_folder = folders
     input_key, gt_key = keys
 
     if not (input_folder.endswith('.lmdb') and gt_folder.endswith('.lmdb')):
-        raise ValueError(f'{input_key} folder and {gt_key} folder should both in lmdb '
-                         f'formats. But received {input_key}: {input_folder}; '
-                         f'{gt_key}: {gt_folder}')
+        raise ValueError(
+            f'{input_key} folder and {gt_key} folder should both in lmdb '
+            f'formats. But received {input_key}: {input_folder}; '
+            f'{gt_key}: {gt_folder}')
     # ensure that the two meta_info files are the same
     with open(osp.join(input_folder, 'meta_info.txt')) as fin:
         input_lmdb_keys = [line.split('.')[0] for line in fin]
     with open(osp.join(gt_folder, 'meta_info.txt')) as fin:
         gt_lmdb_keys = [line.split('.')[0] for line in fin]
     if set(input_lmdb_keys) != set(gt_lmdb_keys):
-        raise ValueError(f'Keys in {input_key}_folder and {gt_key}_folder are different.')
+        raise ValueError(
+            f'Keys in {input_key}_folder and {gt_key}_folder are different.')
     else:
         paths = []
         for lmdb_key in sorted(input_lmdb_keys):
-            paths.append(dict([(f'{input_key}_path', lmdb_key), (f'{gt_key}_path', lmdb_key)]))
+            paths.append(
+                dict([(f'{input_key}_path', lmdb_key),
+                      (f'{gt_key}_path', lmdb_key)]))
         return paths
 
 
-def paired_paths_from_meta_info_file(folders, keys, meta_info_file, filename_tmpl):
+def paired_paths_from_meta_info_file(folders, keys, meta_info_file,
+                                     filename_tmpl):
     """Generate paired paths from an meta information file.
 
     Each line in the meta information file contains the image names and
@@ -178,14 +186,17 @@ def paired_paths_from_meta_info_file(folders, keys, meta_info_file, filename_tmp
     Returns:
         list[str]: Returned path list.
     """
-    assert len(folders) == 2, ('The len of folders should be 2 with [input_folder, gt_folder]. '
-                               f'But got {len(folders)}')
-    assert len(keys) == 2, f'The len of keys should be 2 with [input_key, gt_key]. But got {len(keys)}'
+    assert len(folders) == 2, (
+        'The len of folders should be 2 with [input_folder, gt_folder]. '
+        f'But got {len(folders)}')
+    assert len(keys) == 2, (
+        'The len of keys should be 2 with [input_key, gt_key]. '
+        f'But got {len(keys)}')
     input_folder, gt_folder = folders
     input_key, gt_key = keys
 
     with open(meta_info_file, 'r') as fin:
-        gt_names = [line.strip().split(' ')[0] for line in fin]
+        gt_names = [line.split(' ')[0] for line in fin]
 
     paths = []
     for gt_name in gt_names:
@@ -193,7 +204,9 @@ def paired_paths_from_meta_info_file(folders, keys, meta_info_file, filename_tmp
         input_name = f'{filename_tmpl.format(basename)}{ext}'
         input_path = osp.join(input_folder, input_name)
         gt_path = osp.join(gt_folder, gt_name)
-        paths.append(dict([(f'{input_key}_path', input_path), (f'{gt_key}_path', gt_path)]))
+        paths.append(
+            dict([(f'{input_key}_path', input_path),
+                  (f'{gt_key}_path', gt_path)]))
     return paths
 
 
@@ -212,24 +225,34 @@ def paired_paths_from_folder(folders, keys, filename_tmpl):
     Returns:
         list[str]: Returned path list.
     """
-    assert len(folders) == 2, ('The len of folders should be 2 with [input_folder, gt_folder]. '
-                               f'But got {len(folders)}')
-    assert len(keys) == 2, f'The len of keys should be 2 with [input_key, gt_key]. But got {len(keys)}'
+    assert len(folders) == 2, (
+        'The len of folders should be 2 with [input_folder, gt_folder]. '
+        f'But got {len(folders)}')
+    assert len(keys) == 2, (
+        'The len of keys should be 2 with [input_key, gt_key]. '
+        f'But got {len(keys)}')
     input_folder, gt_folder = folders
     input_key, gt_key = keys
 
     input_paths = list(scandir(input_folder))
     gt_paths = list(scandir(gt_folder))
-    assert len(input_paths) == len(gt_paths), (f'{input_key} and {gt_key} datasets have different number of images: '
-                                               f'{len(input_paths)}, {len(gt_paths)}.')
+    assert len(input_paths) == len(gt_paths), (
+        f'{input_key} and {gt_key} datasets have different number of images: '
+        f'{len(input_paths)}, {len(gt_paths)}.')
     paths = []
-    for gt_path in gt_paths:
+    for idx in range(len(gt_paths)):
+        gt_path = gt_paths[idx]
         basename, ext = osp.splitext(osp.basename(gt_path))
-        input_name = f'{filename_tmpl.format(basename)}{ext}'
+        input_path = input_paths[idx]
+        basename_input, ext_input = osp.splitext(osp.basename(input_path))
+        input_name = f'{filename_tmpl.format(basename)}{ext_input}'
         input_path = osp.join(input_folder, input_name)
-        assert input_name in input_paths, f'{input_name} is not in {input_key}_paths.'
+        assert input_name in input_paths, (f'{input_name} is not in '
+                                           f'{input_key}_paths.')
         gt_path = osp.join(gt_folder, gt_path)
-        paths.append(dict([(f'{input_key}_path', input_path), (f'{gt_key}_path', gt_path)]))
+        paths.append(
+            dict([(f'{input_key}_path', input_path),
+                  (f'{gt_key}_path', gt_path)]))
     return paths
 
 
@@ -294,7 +317,8 @@ def duf_downsample(x, kernel_size=13, scale=4):
     Returns:
         Tensor: DUF downsampled frames.
     """
-    assert scale in (2, 3, 4), f'Only support scale (2, 3, 4), but got {scale}.'
+    assert scale in (2, 3,
+                     4), f'Only support scale (2, 3, 4), but got {scale}.'
 
     squeeze_flag = False
     if x.ndim == 4:
@@ -306,7 +330,8 @@ def duf_downsample(x, kernel_size=13, scale=4):
     x = F.pad(x, (pad_w, pad_w, pad_h, pad_h), 'reflect')
 
     gaussian_filter = generate_gaussian_kernel(kernel_size, 0.4 * scale)
-    gaussian_filter = torch.from_numpy(gaussian_filter).type_as(x).unsqueeze(0).unsqueeze(0)
+    gaussian_filter = torch.from_numpy(gaussian_filter).type_as(x).unsqueeze(
+        0).unsqueeze(0)
     x = F.conv2d(x, gaussian_filter, stride=scale)
     x = x[:, :, 2:-2, 2:-2]
     x = x.view(b, t, c, x.size(2), x.size(3))

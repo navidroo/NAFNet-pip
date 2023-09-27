@@ -1,3 +1,10 @@
+# ------------------------------------------------------------------------
+# Copyright (c) 2022 megvii-model. All Rights Reserved.
+# ------------------------------------------------------------------------
+# Modified from BasicSR (https://github.com/xinntao/BasicSR)
+# Copyright 2018-2020 BasicSR Authors
+# ------------------------------------------------------------------------
+
 import math
 import torch
 from torch.utils.data.sampler import Sampler
@@ -23,7 +30,8 @@ class EnlargedSampler(Sampler):
         self.num_replicas = num_replicas
         self.rank = rank
         self.epoch = 0
-        self.num_samples = math.ceil(len(self.dataset) * ratio / self.num_replicas)
+        self.num_samples = math.ceil(
+            len(self.dataset) * ratio / self.num_replicas)
         self.total_size = self.num_samples * self.num_replicas
 
     def __iter__(self):

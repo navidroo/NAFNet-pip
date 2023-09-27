@@ -1,3 +1,10 @@
+# ------------------------------------------------------------------------
+# Copyright (c) 2022 megvii-model. All Rights Reserved.
+# ------------------------------------------------------------------------
+# Modified from BasicSR (https://github.com/xinntao/BasicSR)
+# Copyright 2018-2020 BasicSR Authors
+# ------------------------------------------------------------------------
+
 # Modified from https://github.com/open-mmlab/mmcv/blob/master/mmcv/runner/dist_utils.py  # noqa: E501
 import functools
 import os
@@ -41,7 +48,8 @@ def _init_dist_slurm(backend, port=None):
     node_list = os.environ['SLURM_NODELIST']
     num_gpus = torch.cuda.device_count()
     torch.cuda.set_device(proc_id % num_gpus)
-    addr = subprocess.getoutput(f'scontrol show hostname {node_list} | head -n1')
+    addr = subprocess.getoutput(
+        f'scontrol show hostname {node_list} | head -n1')
     # specify master port
     if port is not None:
         os.environ['MASTER_PORT'] = str(port)

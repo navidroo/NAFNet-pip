@@ -1,7 +1,7 @@
 ## Project
 
 This project is a pip installable version of "NAFNet: Nonlinear Activation Free Network for Image Restoration". It can be used to run inside a docker container. 
-NAFNet is build using BasicSR. The current project is built using both NAFNet and BasicSR. 
+NAFNet is built using BasicSR. The current project is built using both NAFNet and BasicSR. 
 
 ## 📜 License and Acknowledgement
 

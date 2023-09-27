@@ -92,24 +92,23 @@ More details about **license** and **acknowledgement** are in [LICENSE](LICENSE/
 
 ## 🌏 Citations
 
-If BasicSR helps your research or work, please consider citing BasicSR.<br>
+If BasicSR helps your research or work, please cite BasicSR.<br>
 The following is a BibTeX reference. The BibTeX entry requires the `url` LaTeX package.
 
 ``` latex
-@misc{wang2020basicsr,
-  author =       {Xintao Wang and Ke Yu and Kelvin C.K. Chan and
-                  Chao Dong and Chen Change Loy},
+@misc{basicsr,
+  author =       {Xintao Wang and Liangbin Xie and Ke Yu and Kelvin C.K. Chan and Chen Change Loy and Chao Dong},
   title =        {{BasicSR}: Open Source Image and Video Restoration Toolbox},
-  howpublished = {\url{https://github.com/xinntao/BasicSR}},
-  year =         {2018}
+  howpublished = {\url{https://github.com/XPixelGroup/BasicSR}},
+  year =         {2022}
 }
 ```
 
-> Xintao Wang, Ke Yu, Kelvin C.K. Chan, Chao Dong and Chen Change Loy. BasicSR: Open Source Image and Video Restoration Toolbox. <https://github.com/xinntao/BasicSR>, 2018.
+> Xintao Wang, Liangbin Xie, Ke Yu, Kelvin C.K. Chan, Chen Change Loy and Chao Dong. BasicSR: Open Source Image and Video Restoration Toolbox. <https://github.com/xinntao/BasicSR>, 2022.
 
 ## 📧 Contact
 
-If you have any questions, please email `xintao.wang@outlook.com`.
+If you have any questions, please email `xintao.alpha@gmail.com`, `xintao.wang@outlook.com`.
 
 <br>
 
@@ -120,3 +119,5 @@ If you have any questions, please email `xintao.wang@outlook.com`.
   <img src="https://user-images.githubusercontent.com/17445847/134879983-6f2d663b-16e7-49f2-97e1-7c53c8a5f71a.jpg"  height="300">  &emsp;
   <img src="https://user-images.githubusercontent.com/17445847/139572512-8e192aac-00fa-432b-ac8e-a33026b019df.png"  height="300">
 </p>
+
+![visitors](https://visitor-badge.glitch.me/badge?page_id=XPixelGroup/BasicSR) (start from 2022-11-06)
